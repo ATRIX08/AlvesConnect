@@ -333,6 +333,10 @@ async function apiRequest(path, options = {}) {
   const payload = await response.json().catch(() => ({}));
 
   if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      state.csrfToken = "";
+      showLogin("Sua sessão expirou. Entre novamente para salvar alterações.");
+    }
     throw new Error(payload.error || "Não foi possível concluir a ação.");
   }
 
@@ -2312,7 +2316,7 @@ function uploadFileToSignedUrl(signedUrl, file, onProgress) {
     const request = new XMLHttpRequest();
     const formData = new FormData();
     formData.append("cacheControl", "31536000");
-    formData.append("", file);
+    formData.append("file", file);
 
     request.open("PUT", signedUrl);
     request.upload.addEventListener("progress", (event) => {
@@ -2325,7 +2329,8 @@ function uploadFileToSignedUrl(signedUrl, file, onProgress) {
         resolve();
         return;
       }
-      reject(new Error("Não foi possível enviar o vídeo."));
+      const details = request.responseText ? ` ${request.responseText.slice(0, 180)}` : "";
+      reject(new Error(`Não foi possível enviar o vídeo.${details}`));
     });
     request.addEventListener("error", () => reject(new Error("Falha de conexão durante o upload.")));
     request.send(formData);
