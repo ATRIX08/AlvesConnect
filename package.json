@@ -1,0 +1,18 @@
+{
+  "name": "alves-connect-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Portfolio Alves Connect com backend simples para admin.",
+  "main": "server.js",
+  "scripts": {
+    "build": "node --check server.js && node --check assets/js/main.js && node --check assets/js/admin.js",
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.112.2",
+    "dotenv": "^16.4.7",
+    "express": "^4.19.2",
+    "helmet": "^7.1.0"
+  }
+}

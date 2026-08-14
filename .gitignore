@@ -1,0 +1,20 @@
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Logs temporarios
+*.log
+
+# Arquivos locais/sensiveis
+.env
+.env.*
+!.env.example
+.vscode/
+
+# Pastas geradas por ferramentas, caso sejam recriadas
+node_modules/
+.next/
+dist/
+build/
+
+.vercel

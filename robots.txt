@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mariana-atrix08s-projects.vercel.app/sitemap.xml

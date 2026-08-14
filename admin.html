@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin | Alves Connect</title>
+    <link rel="icon" href="assets/img/logo-alves-connect-crop.png" />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+  <body class="admin-page cms-admin">
+    <section class="login-wrap" data-login-screen>
+      <div class="login-shell">
+        <div class="login-visual">
+          <img src="assets/img/logo-alves-connect-crop.png" alt="Alves Connect Social Media" />
+          <span>Painel privado</span>
+          <strong>Administre o site com clareza, rapidez e controle.</strong>
+        </div>
+
+        <div class="login-card">
+          <span class="tag">Acesso restrito</span>
+          <h1>Entrar no painel</h1>
+          <p>Use o usuário e a senha cadastrados para gerenciar o conteúdo da Alves Connect.</p>
+
+          <form class="admin-form" data-login-form>
+            <label class="field">
+              Usuário
+              <input name="username" autocomplete="username" required placeholder="Digite o usuário" />
+            </label>
+            <label class="field">
+              Senha
+              <input name="password" autocomplete="current-password" required placeholder="Digite a senha" type="password" />
+            </label>
+            <button class="admin-button" type="submit">Entrar no admin</button>
+            <p class="login-error" data-login-message></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <div class="cms-shell" data-admin-area hidden>
+      <aside class="cms-sidebar" data-sidebar aria-label="Navegação administrativa">
+        <div class="cms-brand">
+          <img src="assets/img/logo-alves-connect-crop.png" alt="Alves Connect Social Media" />
+          <div>
+            <strong>Alves Connect</strong>
+            <span>CMS</span>
+          </div>
+        </div>
+
+        <nav class="cms-nav" aria-label="Menu do painel">
+          <button type="button" data-page="overview" class="active"><span class="cms-icon" data-icon="dashboard"></span>Visão Geral</button>
+          <button type="button" data-page="content"><span class="cms-icon" data-icon="content"></span>Conteúdo do Site</button>
+          <button type="button" data-page="services"><span class="cms-icon" data-icon="services"></span>Serviços</button>
+          <button type="button" data-page="projects"><span class="cms-icon" data-icon="projects"></span>Projetos</button>
+          <button type="button" data-page="videos"><span class="cms-icon" data-icon="videos"></span>Vídeos</button>
+          <button type="button" data-page="clients"><span class="cms-icon" data-icon="clients"></span>Clientes</button>
+          <button type="button" data-page="testimonials"><span class="cms-icon" data-icon="testimonials"></span>Depoimentos</button>
+          <button type="button" data-page="leads"><span class="cms-icon" data-icon="leads"></span>Leads</button>
+          <button type="button" data-page="contacts"><span class="cms-icon" data-icon="contacts"></span>Contatos e Redes</button>
+          <button type="button" data-page="media"><span class="cms-icon" data-icon="media"></span>Biblioteca de Mídia</button>
+          <button type="button" data-page="settings"><span class="cms-icon" data-icon="settings"></span>Configurações</button>
+        </nav>
+
+        <div class="cms-sidebar-footer">
+          <a href="index.html" target="_blank" rel="noopener">Ver site</a>
+          <button type="button" data-logout>Sair</button>
+        </div>
+      </aside>
+
+      <div class="cms-sidebar-overlay" data-sidebar-overlay></div>
+
+      <section class="cms-workspace">
+        <header class="cms-topbar">
+          <button class="cms-menu-button" type="button" data-sidebar-open aria-label="Abrir menu">
+            <span></span><span></span><span></span>
+          </button>
+          <div>
+            <span data-page-kicker>Painel administrativo</span>
+            <h1 data-page-title>Visão Geral</h1>
+          </div>
+          <div class="cms-topbar-actions">
+            <a class="cms-button secondary" href="index.html" target="_blank" rel="noopener">Ver site</a>
+            <button class="cms-avatar" type="button" data-logout aria-label="Sair do admin">AC</button>
+          </div>
+        </header>
+
+        <main class="cms-main" data-admin-view aria-live="polite"></main>
+      </section>
+    </div>
+
+    <aside class="cms-drawer" data-editor aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="editor-title">
+      <div class="cms-drawer-panel">
+        <header>
+          <div>
+            <span data-editor-kicker>Editar</span>
+            <h2 id="editor-title" data-editor-title>Conteúdo</h2>
+          </div>
+          <button type="button" class="cms-icon-button" data-editor-close aria-label="Fechar editor">×</button>
+        </header>
+        <div class="cms-drawer-body" data-editor-body></div>
+      </div>
+    </aside>
+
+    <div class="cms-confirm" data-confirm hidden role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <div>
+        <span data-confirm-kicker>Confirmar ação</span>
+        <h2 id="confirm-title" data-confirm-title>Excluir item?</h2>
+        <p data-confirm-text>Essa ação não pode ser desfeita.</p>
+        <div class="cms-confirm-actions">
+          <button type="button" class="cms-button secondary" data-confirm-cancel>Cancelar</button>
+          <button type="button" class="cms-button danger" data-confirm-ok>Excluir</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cms-toast-region" data-toast-region aria-live="polite" aria-atomic="true"></div>
+
+    <script src="assets/js/site-config.js"></script>
+    <script src="assets/js/admin.js"></script>
+  </body>
+</html>
