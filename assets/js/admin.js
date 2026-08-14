@@ -29,7 +29,8 @@ const acceptedVideoTypes = new Set(["video/mp4", "video/webm", "video/ogg", "vid
 const videoAccept = "video/mp4,video/webm,video/ogg,video/quicktime,.mov";
 const acceptedImageExtensions = /\.(jpe?g|png|webp|gif|heic|heif)$/i;
 const acceptedVideoExtensions = /\.(mp4|webm|ogg|mov)$/i;
-const maxVideoUploadSize = 50 * 1024 * 1024;
+const maxImageUploadSize = 12 * 1024 * 1024;
+const maxVideoUploadSize = 250 * 1024 * 1024;
 
 const defaultContent = {
   heroEyebrow: "Social Media • Conteúdo • Estratégia",
@@ -505,6 +506,20 @@ function isAcceptedImageFile(file) {
   return acceptedImageTypes.has(file.type) || acceptedImageExtensions.test(file.name);
 }
 
+function getImageContentType(file) {
+  if (acceptedImageTypes.has(file.type)) return file.type;
+  const extension = file.name.split(".").pop()?.toLowerCase();
+  return {
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    webp: "image/webp",
+    gif: "image/gif",
+    heic: "image/heic",
+    heif: "image/heif",
+  }[extension] || "";
+}
+
 function getVideoEmbedUrl(url = "") {
   try {
     const parsedUrl = new URL(url);
@@ -702,10 +717,12 @@ function uploadField({ target, label, type = "image", value = "", title = "", hi
         <strong>${escapeHtml(label)}</strong>
         <p>${escapeHtml(hint || "Envie pelo computador ou celular. O sistema salva a URL automaticamente.")}</p>
         <div class="cms-upload-actions">
-          <button type="button" class="cms-button secondary" data-upload-trigger>${escapeHtml(buttonLabel)}</button>
+          <label class="cms-button secondary cms-file-button">
+            <span>${escapeHtml(buttonLabel)}</span>
+            <input class="cms-hidden-file" type="file" accept="${escapeAttr(accept)}" data-upload-input />
+          </label>
           <button type="button" class="cms-button ghost" data-clear-media="${escapeAttr(target)}">Remover</button>
         </div>
-        <input class="cms-hidden-file" type="file" accept="${escapeAttr(accept)}" data-upload-input />
         <label class="cms-field cms-url-field">
           <span>${escapeHtml(secondaryLabel)}</span>
           <input name="${escapeAttr(target)}" value="${escapeAttr(value)}" placeholder="${type === "video" ? "https://..." : "https://.../imagem.jpg"}" data-upload-url-field />
@@ -729,8 +746,10 @@ function galleryUploadField(project = {}) {
         hint: "Use para imagens extras do projeto. A imagem principal continua sendo o thumbnail.",
       })}
       <div class="cms-upload-actions">
-        <button type="button" class="cms-button secondary" data-gallery-trigger>Enviar imagens para galeria</button>
-        <input class="cms-hidden-file" type="file" accept="${imageAccept}" multiple data-gallery-input />
+        <label class="cms-button secondary cms-file-button">
+          <span>Enviar imagens para galeria</span>
+          <input class="cms-hidden-file" type="file" accept="${imageAccept}" multiple data-gallery-input />
+        </label>
       </div>
       <div class="cms-upload-status" data-gallery-status></div>
     </div>
@@ -1212,10 +1231,14 @@ function renderMediaPage() {
         <p>Depois de enviar, copie a URL ou selecione a mídia dentro de projetos, serviços, vídeos, clientes e depoimentos.</p>
       </div>
       <div class="cms-upload-actions">
-        <button type="button" class="cms-button secondary" data-media-upload-trigger="image">Enviar imagem</button>
-        <button type="button" class="cms-button secondary" data-media-upload-trigger="video">Enviar vídeo</button>
-        <input class="cms-hidden-file" type="file" accept="${imageAccept}" data-media-upload-input="image" />
-        <input class="cms-hidden-file" type="file" accept="${videoAccept}" data-media-upload-input="video" />
+        <label class="cms-button secondary cms-file-button">
+          <span>Enviar imagem</span>
+          <input class="cms-hidden-file" type="file" accept="${imageAccept}" data-media-upload-input="image" />
+        </label>
+        <label class="cms-button secondary cms-file-button">
+          <span>Enviar vídeo</span>
+          <input class="cms-hidden-file" type="file" accept="${videoAccept}" data-media-upload-input="video" />
+        </label>
       </div>
       <div class="cms-upload-status" data-media-upload-status></div>
     </section>
@@ -1265,8 +1288,10 @@ function renderMediaCard(item) {
         <button type="button" class="cms-button secondary" data-action="copy-media" data-id="${escapeAttr(item.id)}">Copiar URL</button>
         ${
           canReplace
-            ? `<button type="button" class="cms-button secondary" data-media-replace-trigger="${escapeAttr(item.id)}">Substituir</button>
-               <input class="cms-hidden-file" type="file" accept="${item.type === "video" ? videoAccept : imageAccept}" data-media-replace-input="${escapeAttr(item.id)}" />`
+            ? `<label class="cms-button secondary cms-file-button">
+                 <span>Substituir</span>
+                 <input class="cms-hidden-file" type="file" accept="${item.type === "video" ? videoAccept : imageAccept}" data-media-replace-input="${escapeAttr(item.id)}" />
+               </label>`
             : ""
         }
         <button type="button" class="cms-button danger ghost-danger" data-action="delete-media" data-id="${escapeAttr(item.id)}">Excluir</button>
@@ -1955,30 +1980,6 @@ async function handleDrop(type, fromId, toId) {
 
 async function handleViewClick(event) {
   const actionTarget = event.target.closest("[data-action]");
-  const uploadTrigger = event.target.closest("[data-upload-trigger]");
-  const galleryTrigger = event.target.closest("[data-gallery-trigger]");
-  const mediaUploadTrigger = event.target.closest("[data-media-upload-trigger]");
-  const mediaReplaceTrigger = event.target.closest("[data-media-replace-trigger]");
-
-  if (uploadTrigger) {
-    uploadTrigger.closest("[data-upload]")?.querySelector("[data-upload-input]")?.click();
-    return;
-  }
-
-  if (galleryTrigger) {
-    galleryTrigger.closest("[data-gallery-upload]")?.querySelector("[data-gallery-input]")?.click();
-    return;
-  }
-
-  if (mediaUploadTrigger) {
-    view.querySelector(`[data-media-upload-input="${mediaUploadTrigger.dataset.mediaUploadTrigger}"]`)?.click();
-    return;
-  }
-
-  if (mediaReplaceTrigger) {
-    view.querySelector(`[data-media-replace-input="${mediaReplaceTrigger.dataset.mediaReplaceTrigger}"]`)?.click();
-    return;
-  }
 
   const clearButton = event.target.closest("[data-clear-media]");
   if (clearButton) {
@@ -2263,33 +2264,31 @@ function setUploadStatus(element, message, type = "") {
   element.className = `cms-upload-status ${type}`;
 }
 
-function readFileAsDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.addEventListener("load", () => resolve(reader.result));
-    reader.addEventListener("error", () => reject(new Error("Não foi possível ler o arquivo.")));
-    reader.readAsDataURL(file);
-  });
-}
-
-async function uploadImage(file, statusElement = null) {
+async function uploadImage(file, statusElement = null, replacePath = "") {
   if (!isAcceptedImageFile(file)) {
     throw new Error("Use uma imagem JPG, PNG, WEBP, GIF, HEIC ou HEIF.");
   }
-  if (file.size > 6 * 1024 * 1024) {
-    throw new Error("Escolha uma imagem de até 6MB.");
+  if (file.size > maxImageUploadSize) {
+    throw new Error("Escolha uma imagem de até 12MB.");
   }
-  setUploadStatus(statusElement, "Lendo imagem...");
-  const dataUrl = await readFileAsDataUrl(file);
-  setUploadStatus(statusElement, "Enviando imagem...");
-  return apiRequest("/api/uploads/images", {
+
+  const contentType = getImageContentType(file);
+  setUploadStatus(statusElement, "Gerando envio seguro...");
+  const upload = await apiRequest("/api/uploads/images/sign", {
     method: "POST",
     body: JSON.stringify({
       fileName: file.name,
-      contentType: file.type,
-      dataUrl,
+      contentType,
+      size: file.size,
+      path: replacePath,
+      upsert: Boolean(replacePath),
     }),
   });
+
+  await uploadFileToSignedUrl(upload.signedUrl, file, (progress) => {
+    setUploadStatus(statusElement, `Enviando imagem... ${progress}%`);
+  });
+  return upload;
 }
 
 async function uploadVideo(file, statusElement = null, replacePath = "") {
@@ -2297,7 +2296,7 @@ async function uploadVideo(file, statusElement = null, replacePath = "") {
     throw new Error("Use um vídeo MP4, WEBM, OGG ou MOV. Para celular, prefira MP4.");
   }
   if (file.size > maxVideoUploadSize) {
-    throw new Error("Escolha um vídeo de até 50MB.");
+    throw new Error("Escolha um vídeo de até 250MB.");
   }
 
   const contentType = getVideoContentType(file);
@@ -2388,17 +2387,7 @@ async function handleMediaReplace(input) {
     if (item.type === "video") {
       await uploadVideo(file, null, item.path);
     } else {
-      const dataUrl = await readFileAsDataUrl(file);
-      await apiRequest("/api/media/images/replace", {
-        method: "POST",
-        body: JSON.stringify({
-          bucket: item.bucket,
-          path: item.path,
-          fileName: file.name,
-          contentType: file.type,
-          dataUrl,
-        }),
-      });
+      await uploadImage(file, null, item.path);
     }
     await loadMediaLibrary(true);
     showToast("Mídia substituída com sucesso.");

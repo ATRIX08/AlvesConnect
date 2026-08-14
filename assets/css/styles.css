@@ -3284,6 +3284,20 @@ body.cms-menu-open {
   pointer-events: none;
 }
 
+.cms-file-button {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.cms-file-button .cms-hidden-file {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
 .cms-upload-status {
   min-height: 22px;
   color: #927644;

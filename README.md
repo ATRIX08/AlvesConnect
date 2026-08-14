@@ -68,7 +68,7 @@ http://localhost:3000/admin.html
 
 Com Supabase configurado, o vídeo será salvo no banco. Sem Supabase, o projeto usa `data/site-data.json` como fallback local.
 
-Na aba `Vídeos`, também é possível escolher um arquivo do computador ou celular. O admin pede uma URL assinada ao backend e envia o vídeo direto para o Supabase Storage. Use MP4, WEBM, OGG ou MOV com até 50MB.
+Na aba `Vídeos`, também é possível escolher um arquivo do computador ou celular. O admin pede uma URL assinada ao backend e envia o vídeo direto para o Supabase Storage. Use MP4, WEBM, OGG ou MOV com até 250MB.
 
 ## Como editar projetos, cases e contatos
 
@@ -82,7 +82,7 @@ Nesse arquivo você pode trocar título, categoria, descrição, thumbnail, víd
 
 Não cadastre resultados fictícios. O site está preparado para mostrar métricas reais apenas quando elas existirem.
 
-No admin, a aba `Projetos` também permite escolher uma imagem do computador ou celular. A imagem é enviada para o Supabase Storage e o link da capa é preenchido automaticamente. Use imagens JPG, PNG, WEBP ou GIF com até 6MB.
+No admin, a aba `Projetos` também permite escolher uma imagem do computador ou celular. A imagem é enviada direto para o Supabase Storage e o link da capa é preenchido automaticamente. Use imagens JPG, PNG, WEBP, GIF, HEIC ou HEIF com até 12MB.
 
 Os links de Instagram, WhatsApp e e-mail também podem ser definidos no admin; se o Supabase estiver ativo, o admin passa a ser a fonte principal desses links.
 
@@ -151,4 +151,4 @@ O admin usa cookie `httpOnly`, sessão assinada, token CSRF nas ações que alte
 
 O site envia headers de segurança como CSP, `Permissions-Policy`, `X-Frame-Options`, `X-Content-Type-Options`, HSTS e `Referrer-Policy`.
 
-No Supabase, mantenha RLS ativo nas tabelas e use buckets com tipos MIME e tamanho máximo configurados. O bucket de imagens aceita JPG, PNG, WEBP e GIF até 6MB; o bucket de vídeos aceita MP4, WEBM, OGG e MOV até 50MB.
+No Supabase, mantenha RLS ativo nas tabelas e use buckets com tipos MIME e tamanho máximo configurados. O bucket de imagens aceita JPG, PNG, WEBP, GIF, HEIC e HEIF até 12MB; o bucket de vídeos aceita MP4, WEBM, OGG e MOV até 250MB.

@@ -28,7 +28,8 @@ const sessionDurationMs = 1000 * 60 * 60 * 6;
 const loginWindowMs = 1000 * 60 * 15;
 const maxLoginAttempts = 8;
 const loginAttempts = new Map();
-const maxVideoUploadSize = 50 * 1024 * 1024;
+const maxImageUploadSize = 12 * 1024 * 1024;
+const maxVideoUploadSize = 250 * 1024 * 1024;
 const leadWindowMs = 1000 * 60 * 10;
 const maxLeadSubmissions = 5;
 const leadSubmissions = new Map();
@@ -446,7 +447,7 @@ async function ensureImageBucket() {
   const options = {
     public: true,
     allowedMimeTypes: ["image/jpeg", "image/png", "image/webp", "image/gif", "image/heic", "image/heif"],
-    fileSizeLimit: "6MB",
+    fileSizeLimit: maxImageUploadSize,
   };
 
   const { error } = data
@@ -497,8 +498,8 @@ function parseImageUpload(body = {}) {
   }
 
   const buffer = Buffer.from(match[1], "base64");
-  if (buffer.length === 0 || buffer.length > 6 * 1024 * 1024) {
-    throw new Error("A imagem precisa ter até 6MB.");
+  if (buffer.length === 0 || buffer.length > maxImageUploadSize) {
+    throw new Error("A imagem precisa ter até 12MB.");
   }
 
   const extensionFromType = {
@@ -516,6 +517,37 @@ function parseImageUpload(body = {}) {
     buffer,
     contentType,
     filePath: `portfolio/${Date.now()}-${crypto.randomUUID()}-${baseName}.${extension}`,
+  };
+}
+
+function parseImageUploadRequest(body = {}) {
+  const fileName = cleanFileName(body.fileName || "imagem.jpg");
+  const contentType = cleanText(body.contentType, 80);
+  const size = Number(body.size || 0);
+  const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "image/heic", "image/heif"]);
+
+  if (!allowedTypes.has(contentType)) {
+    throw new Error("Use uma imagem JPG, PNG, WEBP, GIF, HEIC ou HEIF.");
+  }
+
+  if (!Number.isFinite(size) || size <= 0 || size > maxImageUploadSize) {
+    throw new Error("A imagem precisa ter até 12MB.");
+  }
+
+  const extensionFromType = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+    "image/gif": "gif",
+    "image/heic": "heic",
+    "image/heif": "heif",
+  }[contentType];
+  const extension = path.extname(fileName).replace(".", "") || extensionFromType;
+  const baseName = path.basename(fileName, path.extname(fileName)) || "imagem";
+
+  return {
+    contentType,
+    filePath: cleanStoragePath(body.path, "portfolio") || `portfolio/${Date.now()}-${crypto.randomUUID()}-${baseName}.${extension}`,
   };
 }
 
@@ -538,7 +570,7 @@ function parseVideoUploadRequest(body = {}) {
   }
 
   if (!Number.isFinite(size) || size <= 0 || size > maxVideoUploadSize) {
-    throw new Error("O vídeo precisa ter até 50MB.");
+    throw new Error("O vídeo precisa ter até 250MB.");
   }
 
   const extensionFromType = {
@@ -1273,6 +1305,37 @@ app.post("/api/uploads/images", isAuthenticated, requireCsrf, async (request, re
 
     const { data } = supabase.storage.from(imageBucket).getPublicUrl(upload.filePath);
     response.status(201).json({ url: data.publicUrl, path: upload.filePath, bucket: imageBucket, type: "image" });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/api/uploads/images/sign", isAuthenticated, requireCsrf, async (request, response, next) => {
+  try {
+    if (!hasSupabaseStorage()) {
+      response.status(400).json({ error: "Configure o Supabase para enviar imagens." });
+      return;
+    }
+
+    const supabase = await getSupabaseClient();
+    const upload = parseImageUploadRequest(request.body || {});
+    await ensureImageBucket();
+
+    const { data, error } = await supabase.storage
+      .from(imageBucket)
+      .createSignedUploadUrl(upload.filePath, { upsert: Boolean(request.body.upsert) });
+    if (error) throw error;
+
+    const publicUrl = supabase.storage.from(imageBucket).getPublicUrl(upload.filePath).data.publicUrl;
+    response.status(201).json({
+      signedUrl: data.signedUrl,
+      token: data.token,
+      path: data.path,
+      url: publicUrl,
+      bucket: imageBucket,
+      type: "image",
+      contentType: upload.contentType,
+    });
   } catch (error) {
     next(error);
   }
