@@ -23,8 +23,11 @@ const confirmCancel = document.querySelector("[data-confirm-cancel]");
 const toastRegion = document.querySelector("[data-toast-region]");
 
 const appConfig = window.alvesConnectConfig || {};
-const acceptedImageTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const imageAccept = "image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif,.heic,.heif";
+const acceptedImageTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "image/heic", "image/heif"]);
 const acceptedVideoTypes = new Set(["video/mp4", "video/webm", "video/ogg", "video/quicktime"]);
+const videoAccept = "video/mp4,video/webm,video/ogg,video/quicktime,.mov";
+const acceptedImageExtensions = /\.(jpe?g|png|webp|gif|heic|heif)$/i;
 const acceptedVideoExtensions = /\.(mp4|webm|ogg|mov)$/i;
 const maxVideoUploadSize = 50 * 1024 * 1024;
 
@@ -498,6 +501,10 @@ function isAcceptedVideoFile(file) {
   return acceptedVideoTypes.has(file.type) || acceptedVideoExtensions.test(file.name);
 }
 
+function isAcceptedImageFile(file) {
+  return acceptedImageTypes.has(file.type) || acceptedImageExtensions.test(file.name);
+}
+
 function getVideoEmbedUrl(url = "") {
   try {
     const parsedUrl = new URL(url);
@@ -678,10 +685,10 @@ function selectField({ name, label, value = "", options = [], hint = "" }) {
 function uploadField({ target, label, type = "image", value = "", title = "", hint = "" }) {
   const accept =
     type === "video"
-      ? "video/mp4,video/webm,video/ogg,video/quicktime,.mov"
+      ? videoAccept
       : type === "mixed"
-        ? "image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/ogg,video/quicktime,.mov"
-        : "image/jpeg,image/png,image/webp,image/gif";
+        ? `${imageAccept},${videoAccept}`
+        : imageAccept;
   const buttonLabel = value ? "Trocar mídia" : type === "video" ? "Enviar vídeo" : type === "mixed" ? "Enviar mídia" : "Enviar imagem";
   const secondaryLabel = type === "video" ? "Ou cole um link do YouTube, Vimeo ou MP4" : "Ou cole uma URL de imagem";
   const previewType = type === "mixed" ? (isDirectVideoUrl(value) || getVideoEmbedUrl(value) ? "video" : "image") : type;
@@ -723,7 +730,7 @@ function galleryUploadField(project = {}) {
       })}
       <div class="cms-upload-actions">
         <button type="button" class="cms-button secondary" data-gallery-trigger>Enviar imagens para galeria</button>
-        <input class="cms-hidden-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple data-gallery-input />
+        <input class="cms-hidden-file" type="file" accept="${imageAccept}" multiple data-gallery-input />
       </div>
       <div class="cms-upload-status" data-gallery-status></div>
     </div>
@@ -1207,9 +1214,10 @@ function renderMediaPage() {
       <div class="cms-upload-actions">
         <button type="button" class="cms-button secondary" data-media-upload-trigger="image">Enviar imagem</button>
         <button type="button" class="cms-button secondary" data-media-upload-trigger="video">Enviar vídeo</button>
-        <input class="cms-hidden-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-media-upload-input="image" />
-        <input class="cms-hidden-file" type="file" accept="video/mp4,video/webm,video/ogg,video/quicktime,.mov" data-media-upload-input="video" />
+        <input class="cms-hidden-file" type="file" accept="${imageAccept}" data-media-upload-input="image" />
+        <input class="cms-hidden-file" type="file" accept="${videoAccept}" data-media-upload-input="video" />
       </div>
+      <div class="cms-upload-status" data-media-upload-status></div>
     </section>
 
     <div class="cms-toolbar">
@@ -1258,7 +1266,7 @@ function renderMediaCard(item) {
         ${
           canReplace
             ? `<button type="button" class="cms-button secondary" data-media-replace-trigger="${escapeAttr(item.id)}">Substituir</button>
-               <input class="cms-hidden-file" type="file" accept="${item.type === "video" ? "video/mp4,video/webm,video/ogg,video/quicktime,.mov" : "image/jpeg,image/png,image/webp,image/gif"}" data-media-replace-input="${escapeAttr(item.id)}" />`
+               <input class="cms-hidden-file" type="file" accept="${item.type === "video" ? videoAccept : imageAccept}" data-media-replace-input="${escapeAttr(item.id)}" />`
             : ""
         }
         <button type="button" class="cms-button danger ghost-danger" data-action="delete-media" data-id="${escapeAttr(item.id)}">Excluir</button>
@@ -2265,8 +2273,8 @@ function readFileAsDataUrl(file) {
 }
 
 async function uploadImage(file, statusElement = null) {
-  if (!acceptedImageTypes.has(file.type)) {
-    throw new Error("Use uma imagem JPG, PNG, WEBP ou GIF.");
+  if (!isAcceptedImageFile(file)) {
+    throw new Error("Use uma imagem JPG, PNG, WEBP, GIF, HEIC ou HEIF.");
   }
   if (file.size > 6 * 1024 * 1024) {
     throw new Error("Escolha uma imagem de até 6MB.");
@@ -2341,14 +2349,19 @@ async function handleStandaloneMediaUpload(input) {
   const file = input.files?.[0];
   if (!file) return;
   const type = input.dataset.mediaUploadInput;
+  const panel = input.closest(".cms-media-uploader-panel");
+  const status = panel?.querySelector("[data-media-upload-status]");
   input.disabled = true;
 
   try {
-    const result = type === "video" ? await uploadVideo(file) : await uploadImage(file);
+    setUploadStatus(status, type === "video" ? "Enviando vídeo..." : "Enviando imagem...");
+    const result = type === "video" ? await uploadVideo(file, status) : await uploadImage(file, status);
     await loadMediaLibrary(true);
     await navigator.clipboard?.writeText(result.url);
+    setUploadStatus(status, "Mídia enviada. A URL foi copiada.", "success");
     showToast("Mídia enviada. URL copiada.");
   } catch (error) {
+    setUploadStatus(status, error.message, "error");
     showToast(error.message, "error");
   } finally {
     input.disabled = false;

@@ -443,13 +443,15 @@ function cleanFileName(fileName) {
 async function ensureImageBucket() {
   const supabase = await getSupabaseClient();
   const { data } = await supabase.storage.getBucket(imageBucket);
-  if (data) return;
-
-  const { error } = await supabase.storage.createBucket(imageBucket, {
+  const options = {
     public: true,
-    allowedMimeTypes: ["image/jpeg", "image/png", "image/webp", "image/gif"],
+    allowedMimeTypes: ["image/jpeg", "image/png", "image/webp", "image/gif", "image/heic", "image/heif"],
     fileSizeLimit: "6MB",
-  });
+  };
+
+  const { error } = data
+    ? await supabase.storage.updateBucket(imageBucket, options)
+    : await supabase.storage.createBucket(imageBucket, options);
 
   if (error && !String(error.message).toLowerCase().includes("already exists")) {
     throw error;
@@ -483,13 +485,13 @@ function parseImageUpload(body = {}) {
   const fileName = cleanFileName(body.fileName || "imagem.jpg");
   const contentType = cleanText(body.contentType, 80);
   const dataUrl = cleanText(body.dataUrl, 9_000_000);
-  const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+  const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "image/heic", "image/heif"]);
 
   if (!allowedTypes.has(contentType)) {
-    throw new Error("Use uma imagem JPG, PNG, WEBP ou GIF.");
+    throw new Error("Use uma imagem JPG, PNG, WEBP, GIF, HEIC ou HEIF.");
   }
 
-  const match = dataUrl.match(/^data:image\/(?:jpeg|png|webp|gif);base64,([a-zA-Z0-9+/=]+)$/);
+  const match = dataUrl.match(/^data:image\/(?:jpeg|png|webp|gif|heic|heif);base64,([a-zA-Z0-9+/=]+)$/);
   if (!match) {
     throw new Error("Imagem inválida.");
   }
@@ -504,6 +506,8 @@ function parseImageUpload(body = {}) {
     "image/png": "png",
     "image/webp": "webp",
     "image/gif": "gif",
+    "image/heic": "heic",
+    "image/heif": "heif",
   }[contentType];
   const extension = path.extname(fileName).replace(".", "") || extensionFromType;
   const baseName = path.basename(fileName, path.extname(fileName)) || "imagem";
