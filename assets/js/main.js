@@ -350,18 +350,12 @@ function isDirectVideoUrl(url) {
   }
 }
 
-function getVideoType(url) {
+function isMovVideoUrl(url) {
   try {
-    const pathname = new URL(url).pathname.toLowerCase();
-    if (pathname.endsWith(".mp4")) return "video/mp4";
-    if (pathname.endsWith(".webm")) return "video/webm";
-    if (pathname.endsWith(".ogg")) return "video/ogg";
-    if (pathname.endsWith(".mov")) return "video/quicktime";
+    return /\.mov(\?.*)?$/i.test(new URL(url).pathname);
   } catch {
-    return "";
+    return false;
   }
-
-  return "";
 }
 
 function createVideoFallback(url) {
@@ -382,7 +376,6 @@ function createVideoFallback(url) {
 
 function createModalVideo(url, title, poster = "") {
   const video = document.createElement("video");
-  const source = document.createElement("source");
 
   video.controls = true;
   video.playsInline = true;
@@ -390,9 +383,7 @@ function createModalVideo(url, title, poster = "") {
   video.setAttribute("aria-label", title);
   video.setAttribute("controlsList", "nodownload");
   if (poster) video.poster = poster;
-  source.src = url;
-  source.type = getVideoType(url);
-  video.appendChild(source);
+  video.src = url;
   video.addEventListener("error", () => {
     video.replaceWith(createVideoFallback(url));
   });
@@ -564,7 +555,7 @@ function createVideoCard(video, index) {
   card.className = "reel-card";
   frame.className = "reel-frame";
 
-  if (isDirectVideoUrl(video.url)) {
+  if (isDirectVideoUrl(video.url) && !isMovVideoUrl(video.url)) {
     frame.appendChild(createInlineVideo(video.url, video.title, video.thumbnail || ""));
   } else if (embedUrl) {
     const posterButton = document.createElement("button");
@@ -591,7 +582,15 @@ function createVideoCard(video, index) {
     placeholderButton.className = "reel-placeholder-button";
     placeholderButton.type = "button";
     placeholderButton.setAttribute("aria-label", `Abrir vídeo ${video.title}`);
-    placeholderButton.appendChild(createNeutralMedia(index % 2 === 0 ? "navy" : "gold"));
+    if (video.thumbnail) {
+      const image = document.createElement("img");
+      image.src = video.thumbnail;
+      image.alt = video.title;
+      image.loading = "lazy";
+      placeholderButton.appendChild(image);
+    } else {
+      placeholderButton.appendChild(createNeutralMedia(index % 2 === 0 ? "navy" : "gold"));
+    }
     placeholderButton.insertAdjacentHTML("beforeend", '<span class="play-badge">Play</span>');
     placeholderButton.addEventListener("click", () => openVideoModalFromCard(video, index));
     frame.appendChild(placeholderButton);
@@ -606,7 +605,7 @@ function createVideoCard(video, index) {
   if (canPlayInline) {
     expandButton.className = "reel-expand";
     expandButton.type = "button";
-    expandButton.textContent = "Ver maior";
+    expandButton.textContent = isMovVideoUrl(video.url) ? "Assistir vídeo" : "Ver maior";
     expandButton.addEventListener("click", () => openVideoModalFromCard(video, index));
     card.appendChild(expandButton);
   }
