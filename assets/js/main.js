@@ -555,7 +555,7 @@ function createVideoCard(video, index) {
   card.className = "reel-card";
   frame.className = "reel-frame";
 
-  if (isDirectVideoUrl(video.url) && !isMovVideoUrl(video.url)) {
+  if (isDirectVideoUrl(video.url)) {
     frame.appendChild(createInlineVideo(video.url, video.title, video.thumbnail || ""));
   } else if (embedUrl) {
     const posterButton = document.createElement("button");
