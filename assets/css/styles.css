@@ -939,15 +939,15 @@ select:focus-visible {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 18px;
-  max-width: 980px;
+  gap: 16px;
+  max-width: 760px;
   margin: 0 auto;
 }
 
 .logo-cloud span {
   display: grid;
-  width: clamp(300px, 30vw, 420px);
-  min-height: 160px;
+  width: clamp(230px, 22vw, 320px);
+  min-height: 136px;
   place-items: center;
   border: 1px dashed rgba(16, 32, 61, 0.16);
   border-radius: 8px;
@@ -961,8 +961,9 @@ select:focus-visible {
 
 .logo-cloud figure {
   display: grid;
-  width: clamp(300px, 30vw, 420px);
-  min-height: 170px;
+  overflow: hidden;
+  width: clamp(230px, 22vw, 320px);
+  min-height: 142px;
   place-items: center;
   border: 1px solid rgba(223, 227, 234, 0.9);
   border-radius: 8px;
@@ -971,7 +972,7 @@ select:focus-visible {
     #ffffff;
   box-shadow: 0 22px 56px rgba(16, 32, 61, 0.08);
   margin: 0;
-  padding: 30px;
+  padding: 14px;
   transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
 }
 
@@ -982,9 +983,10 @@ select:focus-visible {
 }
 
 .logo-cloud img {
-  max-width: min(320px, 94%);
-  max-height: 142px;
+  max-width: min(300px, 100%);
+  max-height: 134px;
   object-fit: contain;
+  transform: scale(1.12);
 }
 
 .reels-grid {
@@ -2252,13 +2254,13 @@ select:focus-visible {
 
   .logo-cloud span,
   .logo-cloud figure {
-    width: 100%;
-    min-height: 150px;
+    width: min(100%, 300px);
+    min-height: 132px;
   }
 
   .logo-cloud img {
-    max-width: min(260px, 92%);
-    max-height: 120px;
+    max-width: min(276px, 100%);
+    max-height: 124px;
   }
 
   .service-card {
