@@ -254,12 +254,9 @@ select:focus-visible {
   padding: 150px 0 82px;
   border-bottom: 1px solid rgba(223, 227, 234, 0.9);
   background:
-    linear-gradient(rgba(16, 32, 61, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(16, 32, 61, 0.035) 1px, transparent 1px),
     radial-gradient(circle at 78% 24%, rgba(195, 164, 106, 0.22), transparent 23rem),
     radial-gradient(circle at 8% 78%, rgba(32, 59, 97, 0.12), transparent 18rem),
     linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(251, 248, 242, 0.94) 52%, rgba(233, 239, 246, 0.94) 100%);
-  background-size: 44px 44px, 44px 44px, auto, auto, auto;
 }
 
 .hero::before {
@@ -274,7 +271,23 @@ select:focus-visible {
   animation: float-soft 8s ease-in-out infinite;
 }
 
+.hero::after {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url("../img/simbolo-ac.png");
+  background-position: 2% 10%;
+  background-repeat: repeat;
+  background-size: 260px auto;
+  content: "";
+  filter: saturate(0.8);
+  opacity: 0.055;
+  pointer-events: none;
+}
+
 .hero-grid {
+  position: relative;
+  z-index: 1;
   display: grid;
   min-height: calc(100vh - 232px);
   align-items: center;
@@ -2222,6 +2235,12 @@ select:focus-visible {
     bottom: 76px;
     width: 190px;
     height: 190px;
+  }
+
+  .hero::after {
+    background-position: 4% 7%;
+    background-size: 185px auto;
+    opacity: 0.045;
   }
 
   .hero-grid {
