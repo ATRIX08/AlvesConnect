@@ -13,7 +13,6 @@ const projectList = document.querySelector("[data-project-list]");
 const videoList = document.querySelector("[data-video-list]");
 const serviceList = document.querySelector("[data-service-list]");
 const logoList = document.querySelector("[data-logo-list]");
-const metricList = document.querySelector("[data-metric-list]");
 const filterButtons = document.querySelectorAll("[data-filter]");
 const specialtiesTrack = document.querySelector("[data-specialties-track]");
 const contactForm = document.querySelector("[data-contact-form]");
@@ -204,37 +203,6 @@ function renderAuthority(logos = []) {
       });
     }
   }
-}
-
-function renderMetrics(metrics = []) {
-  if (!metricList) return;
-  metricList.innerHTML = "";
-  const visibleMetrics = metrics.filter(isPublished);
-
-  if (visibleMetrics.length === 0) {
-    metricList.classList.add("is-empty");
-    metricList.innerHTML = `
-      <div class="results-empty">
-        <strong>Métricas reais em preparação</strong>
-        <span>Visualizações, projetos, marcas atendidas e conteúdos produzidos serão exibidos apenas com dados confirmados.</span>
-      </div>
-    `;
-    return;
-  }
-
-  metricList.classList.remove("is-empty");
-  visibleMetrics.forEach((metric) => {
-    const item = document.createElement("article");
-    const value = document.createElement("strong");
-    const label = document.createElement("span");
-    const description = document.createElement("p");
-    item.className = "metric-card";
-    value.textContent = metric.value;
-    label.textContent = metric.label;
-    description.textContent = metric.description || "";
-    item.append(value, label, description);
-    metricList.appendChild(item);
-  });
 }
 
 function getVideoEmbedUrl(url) {
@@ -698,7 +666,6 @@ header?.classList.toggle("is-scrolled", window.scrollY > 18);
 renderProjects();
 renderServices();
 renderAuthority();
-renderMetrics();
 
 fetchSiteData().then((siteData) => {
   applyContent(siteData.content);
@@ -712,5 +679,4 @@ fetchSiteData().then((siteData) => {
   renderVideos(siteData.videos);
   renderServices(siteData.services || []);
   renderAuthority(siteData.logos || []);
-  renderMetrics(siteData.metrics || []);
 });

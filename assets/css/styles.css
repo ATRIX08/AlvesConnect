@@ -987,85 +987,6 @@ select:focus-visible {
   object-fit: contain;
 }
 
-.results-empty span {
-  color: var(--muted);
-  line-height: 1.7;
-}
-
-.results {
-  background:
-    linear-gradient(rgba(16, 32, 61, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(16, 32, 61, 0.035) 1px, transparent 1px),
-    linear-gradient(180deg, #fffdf9, #f6f2eb);
-  background-size: 44px 44px, 44px 44px, auto;
-}
-
-.results-grid {
-  display: grid;
-  align-items: center;
-  gap: 56px;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.8fr);
-}
-
-.results-empty {
-  display: grid;
-  gap: 8px;
-  border: 1px solid rgba(223, 227, 234, 0.9);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 18px 50px rgba(16, 32, 61, 0.07);
-  margin-top: 22px;
-  padding: 20px;
-}
-
-.metrics-grid {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-top: 22px;
-}
-
-.metrics-grid.is-empty {
-  display: block;
-}
-
-.metric-card {
-  border: 1px solid rgba(223, 227, 234, 0.9);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.84);
-  box-shadow: 0 18px 50px rgba(16, 32, 61, 0.07);
-  padding: 20px;
-}
-
-.metric-card strong {
-  display: block;
-  font-family: var(--font-display);
-  font-size: clamp(2.4rem, 6vw, 4rem);
-  line-height: 0.95;
-}
-
-.metric-card span {
-  display: block;
-  color: #8b7045;
-  font-size: 0.76rem;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  margin-top: 8px;
-  text-transform: uppercase;
-}
-
-.metric-card p {
-  color: var(--muted);
-  line-height: 1.6;
-  margin: 10px 0 0;
-}
-
-.results-empty strong {
-  font-family: var(--font-display);
-  font-size: 1.7rem;
-  line-height: 1;
-}
-
 .reels-grid {
   display: grid;
   gap: 18px;
@@ -2195,10 +2116,6 @@ select:focus-visible {
     grid-template-columns: 1fr 1fr;
   }
 
-  .results-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
   .admin-top {
     flex-direction: column;
   }
@@ -2329,8 +2246,7 @@ select:focus-visible {
   .contact-form,
   .footer-grid,
   .admin-stats,
-  .admin-form-wide,
-  .results-grid {
+  .admin-form-wide {
     grid-template-columns: 1fr;
   }
 
@@ -2409,9 +2325,7 @@ select:focus-visible {
   }
 
   .project-body,
-  .service-card,
-  .metric-card,
-  .results-empty {
+  .service-card {
     min-width: 0;
   }
 
