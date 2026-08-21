@@ -83,7 +83,7 @@ const defaultContent = {
   worksTitle: "Projetos selecionados",
   worksText: "Um pouco do conteúdo, das campanhas e das experiências desenvolvidas para diferentes marcas.",
   proofTitle: "Marcas que confiam no nosso trabalho",
-  proofText: "Espaço preparado para logos e depoimentos reais cadastrados posteriormente.",
+  proofText: "Logos de marcas e clientes cadastrados com autorização.",
   resultsTitle: "Conteúdo bonito chama atenção. Resultado faz a diferença.",
   resultsText: "Quando houver métricas reais, elas poderão ser apresentadas aqui com clareza e responsabilidade.",
   processLabel: "Processo",
@@ -270,7 +270,7 @@ const contentSections = [
     id: "authority",
     title: "Clientes e autoridade",
     anchor: "autoridade",
-    description: "Texto acima de logos e depoimentos.",
+    description: "Texto acima das logos.",
     keys: ["authorityLabel", "proofTitle", "proofText"],
     fields: [
       { key: "authorityLabel", label: "Etiqueta", max: 80 },

@@ -13,7 +13,6 @@ const projectList = document.querySelector("[data-project-list]");
 const videoList = document.querySelector("[data-video-list]");
 const serviceList = document.querySelector("[data-service-list]");
 const logoList = document.querySelector("[data-logo-list]");
-const testimonialList = document.querySelector("[data-testimonial-list]");
 const metricList = document.querySelector("[data-metric-list]");
 const filterButtons = document.querySelectorAll("[data-filter]");
 const specialtiesTrack = document.querySelector("[data-specialties-track]");
@@ -183,13 +182,12 @@ function renderServices(services = []) {
   source.filter(isPublished).forEach((service, index) => serviceList.appendChild(createServiceCard(service, index)));
 }
 
-function renderAuthority(logos = [], testimonials = []) {
+function renderAuthority(logos = []) {
   const visibleLogos = logos.filter(isPublished);
-  const visibleTestimonials = testimonials.filter(isPublished);
   if (logoList) {
     logoList.innerHTML = "";
     if (visibleLogos.length === 0) {
-      ["Logo cliente", "Logo cliente", "Logo cliente", "Logo cliente"].forEach((label) => {
+      ["Logo cliente", "Logo cliente", "Logo cliente"].forEach((label) => {
         const item = document.createElement("span");
         item.textContent = label;
         logoList.appendChild(item);
@@ -206,42 +204,6 @@ function renderAuthority(logos = [], testimonials = []) {
       });
     }
   }
-
-  if (!testimonialList) return;
-  testimonialList.innerHTML = "";
-
-  if (visibleTestimonials.length === 0) {
-    testimonialList.innerHTML = `
-      <article class="testimonial-empty">
-        <span>Depoimentos</span>
-        <h3>Área pronta para provas sociais reais</h3>
-        <p>Quando houver depoimentos autorizados, o painel poderá receber foto, nome, empresa, cargo e texto. Nenhum cliente ou resultado fictício será exibido.</p>
-      </article>
-    `;
-    return;
-  }
-
-  visibleTestimonials.forEach((testimonial) => {
-    const item = document.createElement("article");
-    const avatar = document.createElement(testimonial.photoUrl ? "img" : "div");
-    const quote = document.createElement("p");
-    const name = document.createElement("strong");
-    const meta = document.createElement("span");
-
-    item.className = "testimonial-card";
-    avatar.className = "testimonial-avatar";
-    if (testimonial.photoUrl) {
-      avatar.src = testimonial.photoUrl;
-      avatar.alt = testimonial.name;
-      avatar.loading = "lazy";
-    }
-    quote.textContent = testimonial.quote;
-    name.textContent = testimonial.name;
-    meta.textContent = [testimonial.company, testimonial.role].filter(Boolean).join(" • ");
-
-    item.append(avatar, quote, name, meta);
-    testimonialList.appendChild(item);
-  });
 }
 
 function renderMetrics(metrics = []) {
@@ -749,6 +711,6 @@ fetchSiteData().then((siteData) => {
   }
   renderVideos(siteData.videos);
   renderServices(siteData.services || []);
-  renderAuthority(siteData.logos || [], siteData.testimonials || []);
+  renderAuthority(siteData.logos || []);
   renderMetrics(siteData.metrics || []);
 });
