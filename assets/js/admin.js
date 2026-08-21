@@ -33,13 +33,51 @@ const maxImageUploadSize = 12 * 1024 * 1024;
 const maxVideoUploadSize = 250 * 1024 * 1024;
 
 const defaultContent = {
+  navHome: "Início",
+  navAbout: "Sobre",
+  navServices: "Serviços",
+  navPortfolio: "Portfólio",
+  navAuthority: "Autoridade",
+  navContact: "Contato",
+  navCta: "Solicitar orçamento",
   heroEyebrow: "Social Media • Conteúdo • Estratégia",
   heroTitle: "Alves Connect",
+  heroLineOne: "Conteúdo que conecta.",
+  heroLineTwo: "Estratégia que posiciona.",
+  heroLineThree: "Criatividade que faz sua marca ser lembrada.",
   heroText:
     "Criamos estratégias, conteúdos, vídeos e identidades visuais para transformar a presença digital de marcas em algo profissional, consistente e memorável.",
+  heroPrimaryButton: "Conhecer meu trabalho",
+  heroSecondaryButton: "Solicitar orçamento",
+  heroProofOne: "Social Media",
+  heroProofTwo: "Reels",
+  heroProofThree: "Design",
+  heroProofFour: "Estratégia Digital",
+  heroNoteOne: "Diagnóstico e estratégia",
+  heroNoteTwo: "Conteúdo com intenção",
+  heroNoteThree: "Marca mais memorável",
+  specialtiesItems: "Social Media\nReels\nCriação de Conteúdo\nDesign\nEstratégia\nIdentidade Visual",
+  aboutLabel: "Sobre",
   aboutTitle: "Conteúdo bonito é importante. Conteúdo com propósito é melhor ainda.",
   aboutText:
     "A Alves Connect nasceu para ajudar marcas a construírem uma presença digital mais profissional, estratégica e autêntica. Cada projeto é pensado de forma personalizada, unindo planejamento, criatividade, produção de conteúdo, vídeo e identidade visual para comunicar aquilo que torna cada negócio único.",
+  aboutPillOne: "Planejamento",
+  aboutPillTwo: "Criatividade",
+  aboutPillThree: "Estratégia",
+  aboutPillFour: "Consistência",
+  servicesLabel: "Serviços",
+  servicesTitle: "O que pode ser desenvolvido para a sua marca",
+  servicesText: "Planos e entregas pensados para dar direção, estética e consistência à presença digital.",
+  worksLabel: "Portfólio",
+  worksFilterAll: "Todos",
+  worksFilterReels: "Reels",
+  worksFilterSocial: "Social Media",
+  worksFilterDesign: "Design",
+  worksFilterCampaigns: "Campanhas",
+  worksFilterEvents: "Eventos",
+  authorityLabel: "Autoridade",
+  resultsLabel: "Resultados",
+  videosLabel: "Vídeos",
   videosTitle: "Reels e vídeos",
   videosText: "Uma seleção de vídeos verticais para apresentar ritmo, linguagem visual e produção de conteúdo.",
   worksTitle: "Projetos selecionados",
@@ -48,11 +86,35 @@ const defaultContent = {
   proofText: "Espaço preparado para logos e depoimentos reais cadastrados posteriormente.",
   resultsTitle: "Conteúdo bonito chama atenção. Resultado faz a diferença.",
   resultsText: "Quando houver métricas reais, elas poderão ser apresentadas aqui com clareza e responsabilidade.",
+  processLabel: "Processo",
+  processTitle: "Da ideia até uma presença digital mais consistente",
+  processStepOneTitle: "Briefing",
+  processStepOneText: "Entendemos a marca, o público, os objetivos e o momento atual da comunicação.",
+  processStepTwoTitle: "Estratégia",
+  processStepTwoText: "Definimos posicionamento, formatos, linguagem e calendário com intenção.",
+  processStepThreeTitle: "Produção",
+  processStepThreeText: "Transformamos ideias em conteúdo, design, vídeos, Reels e materiais visuais.",
+  processStepFourTitle: "Publicação",
+  processStepFourText: "Organizamos a entrega para manter consistência, frequência e clareza.",
+  processStepFiveTitle: "Análise e otimização",
+  processStepFiveText: "Avaliamos o que funcionou e ajustamos a rota para evoluir a presença digital.",
   finalCtaTitle: "Pronta para transformar a presença digital da sua marca?",
   finalCtaText: "Conte um pouco sobre seu negócio e receba uma proposta personalizada.",
+  finalCtaPrimaryButton: "Solicitar orçamento",
+  finalCtaWhatsappButton: "Falar no WhatsApp",
+  contactLabel: "Contato",
   contactTitle: "Vamos criar algo juntos?",
   contactText:
     "Se você quer melhorar a presença digital da sua marca, criar conteúdos profissionais ou desenvolver uma comunicação mais consistente, entre em contato.",
+  contactSubmitButton: "Solicitar orçamento",
+  footerText: "Social Media • Conteúdo • Estratégia",
+  footerNavHome: "Início",
+  footerNavAbout: "Sobre",
+  footerNavServices: "Serviços",
+  footerNavPortfolio: "Portfólio",
+  footerNavContact: "Contato",
+  floatingWhatsappSmall: "Fale comigo",
+  floatingWhatsappStrong: "WhatsApp",
   whatsappMessage: "Olá! Gostaria de saber mais sobre a Alves Connect.",
 };
 
@@ -91,15 +153,61 @@ const pageMeta = {
 
 const contentSections = [
   {
+    id: "navigation",
+    title: "Menu",
+    anchor: "inicio",
+    description: "Textos do menu superior e chamada principal.",
+    keys: ["navHome", "navAbout", "navServices", "navPortfolio", "navAuthority", "navContact", "navCta"],
+    fields: [
+      { key: "navHome", label: "Link: Início", max: 80 },
+      { key: "navAbout", label: "Link: Sobre", max: 80 },
+      { key: "navServices", label: "Link: Serviços", max: 80 },
+      { key: "navPortfolio", label: "Link: Portfólio", max: 80 },
+      { key: "navAuthority", label: "Link: Autoridade", max: 80 },
+      { key: "navContact", label: "Link: Contato", max: 80 },
+      { key: "navCta", label: "Botão do menu", max: 100 },
+    ],
+  },
+  {
     id: "hero",
     title: "Início",
     anchor: "inicio",
     description: "Primeira dobra do site.",
-    keys: ["heroEyebrow", "heroTitle", "heroText"],
+    keys: [
+      "heroEyebrow",
+      "heroTitle",
+      "heroLineOne",
+      "heroLineTwo",
+      "heroLineThree",
+      "heroText",
+      "heroPrimaryButton",
+      "heroSecondaryButton",
+      "heroProofOne",
+      "heroProofTwo",
+      "heroProofThree",
+      "heroProofFour",
+      "heroNoteOne",
+      "heroNoteTwo",
+      "heroNoteThree",
+      "specialtiesItems",
+    ],
     fields: [
       { key: "heroEyebrow", label: "Etiqueta pequena", max: 180 },
       { key: "heroTitle", label: "Título principal", max: 180 },
+      { key: "heroLineOne", label: "Frase de destaque 1", max: 180 },
+      { key: "heroLineTwo", label: "Frase de destaque 2", max: 180 },
+      { key: "heroLineThree", label: "Frase de destaque 3", max: 180 },
       { key: "heroText", label: "Descrição", type: "textarea", max: 2500 },
+      { key: "heroPrimaryButton", label: "Botão principal", max: 100 },
+      { key: "heroSecondaryButton", label: "Botão secundário", max: 100 },
+      { key: "heroProofOne", label: "Selo 1", max: 100 },
+      { key: "heroProofTwo", label: "Selo 2", max: 100 },
+      { key: "heroProofThree", label: "Selo 3", max: 100 },
+      { key: "heroProofFour", label: "Selo 4", max: 100 },
+      { key: "heroNoteOne", label: "Nota visual 1", max: 120 },
+      { key: "heroNoteTwo", label: "Nota visual 2", max: 120 },
+      { key: "heroNoteThree", label: "Nota visual 3", max: 120 },
+      { key: "specialtiesItems", label: "Letreiro de especialidades (uma por linha)", type: "textarea", max: 1200 },
     ],
   },
   {
@@ -107,10 +215,27 @@ const contentSections = [
     title: "Sobre",
     anchor: "sobre",
     description: "Apresentação da marca e do posicionamento.",
-    keys: ["aboutTitle", "aboutText"],
+    keys: ["aboutLabel", "aboutTitle", "aboutText", "aboutPillOne", "aboutPillTwo", "aboutPillThree", "aboutPillFour"],
     fields: [
+      { key: "aboutLabel", label: "Etiqueta", max: 80 },
       { key: "aboutTitle", label: "Título exibido no site", max: 180 },
       { key: "aboutText", label: "Texto sobre", type: "textarea", max: 2500 },
+      { key: "aboutPillOne", label: "Pílula 1", max: 80 },
+      { key: "aboutPillTwo", label: "Pílula 2", max: 80 },
+      { key: "aboutPillThree", label: "Pílula 3", max: 80 },
+      { key: "aboutPillFour", label: "Pílula 4", max: 80 },
+    ],
+  },
+  {
+    id: "servicesIntro",
+    title: "Serviços - chamada",
+    anchor: "servicos",
+    description: "Texto acima dos cards de serviços.",
+    keys: ["servicesLabel", "servicesTitle", "servicesText"],
+    fields: [
+      { key: "servicesLabel", label: "Etiqueta", max: 80 },
+      { key: "servicesTitle", label: "Título", max: 180 },
+      { key: "servicesText", label: "Descrição", type: "textarea", max: 2500 },
     ],
   },
   {
@@ -118,10 +243,27 @@ const contentSections = [
     title: "Projetos",
     anchor: "portfolio",
     description: "Chamada da seção de portfólio.",
-    keys: ["worksTitle", "worksText"],
+    keys: [
+      "worksLabel",
+      "worksTitle",
+      "worksText",
+      "worksFilterAll",
+      "worksFilterReels",
+      "worksFilterSocial",
+      "worksFilterDesign",
+      "worksFilterCampaigns",
+      "worksFilterEvents",
+    ],
     fields: [
+      { key: "worksLabel", label: "Etiqueta", max: 80 },
       { key: "worksTitle", label: "Título da seção", max: 180 },
       { key: "worksText", label: "Descrição da seção", type: "textarea", max: 2500 },
+      { key: "worksFilterAll", label: "Filtro: Todos", max: 80 },
+      { key: "worksFilterReels", label: "Filtro: Reels", max: 80 },
+      { key: "worksFilterSocial", label: "Filtro: Social Media", max: 80 },
+      { key: "worksFilterDesign", label: "Filtro: Design", max: 80 },
+      { key: "worksFilterCampaigns", label: "Filtro: Campanhas", max: 80 },
+      { key: "worksFilterEvents", label: "Filtro: Eventos", max: 80 },
     ],
   },
   {
@@ -129,8 +271,9 @@ const contentSections = [
     title: "Clientes e autoridade",
     anchor: "autoridade",
     description: "Texto acima de logos e depoimentos.",
-    keys: ["proofTitle", "proofText"],
+    keys: ["authorityLabel", "proofTitle", "proofText"],
     fields: [
+      { key: "authorityLabel", label: "Etiqueta", max: 80 },
       { key: "proofTitle", label: "Título exibido no site", max: 180 },
       { key: "proofText", label: "Descrição", type: "textarea", max: 2500 },
     ],
@@ -140,8 +283,9 @@ const contentSections = [
     title: "Resultados",
     anchor: "resultados",
     description: "Texto da seção de métricas.",
-    keys: ["resultsTitle", "resultsText"],
+    keys: ["resultsLabel", "resultsTitle", "resultsText"],
     fields: [
+      { key: "resultsLabel", label: "Etiqueta", max: 80 },
       { key: "resultsTitle", label: "Título exibido no site", max: 180 },
       { key: "resultsText", label: "Descrição", type: "textarea", max: 2500 },
     ],
@@ -151,10 +295,45 @@ const contentSections = [
     title: "Vídeos",
     anchor: "videos",
     description: "Chamada da área de reels e vídeos.",
-    keys: ["videosTitle", "videosText"],
+    keys: ["videosLabel", "videosTitle", "videosText"],
     fields: [
+      { key: "videosLabel", label: "Etiqueta", max: 80 },
       { key: "videosTitle", label: "Título da seção", max: 180 },
       { key: "videosText", label: "Descrição", type: "textarea", max: 2500 },
+    ],
+  },
+  {
+    id: "process",
+    title: "Processo",
+    anchor: "processo",
+    description: "Etapas explicadas no final da página.",
+    keys: [
+      "processLabel",
+      "processTitle",
+      "processStepOneTitle",
+      "processStepOneText",
+      "processStepTwoTitle",
+      "processStepTwoText",
+      "processStepThreeTitle",
+      "processStepThreeText",
+      "processStepFourTitle",
+      "processStepFourText",
+      "processStepFiveTitle",
+      "processStepFiveText",
+    ],
+    fields: [
+      { key: "processLabel", label: "Etiqueta", max: 80 },
+      { key: "processTitle", label: "Título da seção", max: 180 },
+      { key: "processStepOneTitle", label: "Etapa 1 - título", max: 120 },
+      { key: "processStepOneText", label: "Etapa 1 - texto", type: "textarea", max: 700 },
+      { key: "processStepTwoTitle", label: "Etapa 2 - título", max: 120 },
+      { key: "processStepTwoText", label: "Etapa 2 - texto", type: "textarea", max: 700 },
+      { key: "processStepThreeTitle", label: "Etapa 3 - título", max: 120 },
+      { key: "processStepThreeText", label: "Etapa 3 - texto", type: "textarea", max: 700 },
+      { key: "processStepFourTitle", label: "Etapa 4 - título", max: 120 },
+      { key: "processStepFourText", label: "Etapa 4 - texto", type: "textarea", max: 700 },
+      { key: "processStepFiveTitle", label: "Etapa 5 - título", max: 120 },
+      { key: "processStepFiveText", label: "Etapa 5 - texto", type: "textarea", max: 700 },
     ],
   },
   {
@@ -162,10 +341,12 @@ const contentSections = [
     title: "CTA final",
     anchor: "contato",
     description: "Chamada antes do formulário de contato.",
-    keys: ["finalCtaTitle", "finalCtaText"],
+    keys: ["finalCtaTitle", "finalCtaText", "finalCtaPrimaryButton", "finalCtaWhatsappButton"],
     fields: [
       { key: "finalCtaTitle", label: "Título da chamada", max: 180 },
       { key: "finalCtaText", label: "Texto de apoio", type: "textarea", max: 2500 },
+      { key: "finalCtaPrimaryButton", label: "Botão principal", max: 100 },
+      { key: "finalCtaWhatsappButton", label: "Botão WhatsApp", max: 100 },
     ],
   },
   {
@@ -173,10 +354,38 @@ const contentSections = [
     title: "Contato",
     anchor: "contato",
     description: "Texto principal da área de contato.",
-    keys: ["contactTitle", "contactText"],
+    keys: ["contactLabel", "contactTitle", "contactText", "contactSubmitButton"],
     fields: [
+      { key: "contactLabel", label: "Etiqueta", max: 80 },
       { key: "contactTitle", label: "Título exibido no site", max: 180 },
       { key: "contactText", label: "Descrição", type: "textarea", max: 2500 },
+      { key: "contactSubmitButton", label: "Botão do formulário", max: 100 },
+    ],
+  },
+  {
+    id: "footer",
+    title: "Rodapé e WhatsApp",
+    anchor: "contato",
+    description: "Textos pequenos do rodapé e botão flutuante.",
+    keys: [
+      "footerText",
+      "footerNavHome",
+      "footerNavAbout",
+      "footerNavServices",
+      "footerNavPortfolio",
+      "footerNavContact",
+      "floatingWhatsappSmall",
+      "floatingWhatsappStrong",
+    ],
+    fields: [
+      { key: "footerText", label: "Texto abaixo da logo", max: 180 },
+      { key: "footerNavHome", label: "Rodapé: Início", max: 80 },
+      { key: "footerNavAbout", label: "Rodapé: Sobre", max: 80 },
+      { key: "footerNavServices", label: "Rodapé: Serviços", max: 80 },
+      { key: "footerNavPortfolio", label: "Rodapé: Portfólio", max: 80 },
+      { key: "footerNavContact", label: "Rodapé: Contato", max: 80 },
+      { key: "floatingWhatsappSmall", label: "WhatsApp flutuante - texto pequeno", max: 80 },
+      { key: "floatingWhatsappStrong", label: "WhatsApp flutuante - texto forte", max: 80 },
     ],
   },
 ];
@@ -248,9 +457,28 @@ function slug(value = "item") {
     .toLowerCase();
 }
 
+function generateUuid() {
+  if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (character) => {
+    const random = Math.random() * 16 | 0;
+    const value = character === "x" ? random : (random & 0x3) | 0x8;
+    return value.toString(16);
+  });
+}
+
+function isValidUuid(value = "") {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ""));
+}
+
+function normalizeUuid(value, fallback = generateUuid()) {
+  const raw = String(value ?? "").trim();
+  if (!raw) return fallback;
+  const candidate = raw.replace(/^video-/i, "");
+  return isValidUuid(candidate) ? candidate : fallback;
+}
+
 function createId(prefix) {
-  if (window.crypto?.randomUUID) return `${prefix}-${window.crypto.randomUUID()}`;
-  return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  return `${prefix}-${generateUuid()}`;
 }
 
 function sortByPosition(items = []) {
@@ -281,7 +509,7 @@ function normalizeData(data = {}) {
     })),
     videos: sortByPosition(Array.isArray(data.videos) ? data.videos : []).map((video, index) => ({
       ...video,
-      id: video.id || `video-${slug(video.title || index)}`,
+      id: normalizeUuid(video.id, generateUuid()),
       status: normalizePublicationStatus(video.status),
       position: Number.isFinite(Number(video.position)) ? Number(video.position) : index,
       createdAt: video.createdAt || video.created_at || "",
@@ -477,6 +705,15 @@ function formatFileSize(value = 0) {
   if (!Number.isFinite(size) || size <= 0) return "Tamanho não informado";
   if (size < 1024 * 1024) return `${Math.round(size / 1024)} KB`;
   return `${(size / (1024 * 1024)).toFixed(1).replace(".", ",")} MB`;
+}
+
+function titleFromFileName(fileName = "Vídeo enviado") {
+  const baseName = String(fileName || "")
+    .replace(/\.[^.]+$/, "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return baseName || "Vídeo enviado";
 }
 
 function isDirectVideoUrl(url = "") {
@@ -1527,7 +1764,7 @@ function openProjectEditor(id = "", duplicate = false) {
         gallery: [],
         videoUrl: "",
         externalUrl: "",
-        status: "Rascunho",
+        status: "Publicado",
         position: state.data.projects.length,
         tone: "navy",
       };
@@ -1567,7 +1804,7 @@ function openProjectEditor(id = "", duplicate = false) {
       <section class="cms-form-section">
         <h3>Publicação</h3>
         <div class="cms-form-grid two">
-          ${selectField({ name: "status", label: "Status", value: project.status || "Rascunho", options: ["Publicado", "Rascunho", "Oculto"] })}
+          ${selectField({ name: "status", label: "Status", value: project.status || "Publicado", options: ["Publicado", "Rascunho", "Oculto"] })}
           ${field({ name: "position", label: "Ordem", value: project.position, type: "number" })}
         </div>
       </section>
@@ -1581,12 +1818,12 @@ function openVideoEditor(id = "") {
   const video = id
     ? findById("videos", id)
     : {
-        id: createId("video"),
+        id: generateUuid(),
         title: "",
         description: "",
         url: "",
         thumbnail: "",
-        status: "Rascunho",
+        status: "Publicado",
         position: state.data.videos.length,
         createdAt: new Date().toISOString(),
       };
@@ -1601,7 +1838,7 @@ function openVideoEditor(id = "") {
         <p>Use upload para vídeo do celular/computador. YouTube, Vimeo e links externos também funcionam.</p>
       </div>
       ${field({ name: "title", label: "Título", value: video.title, placeholder: "Reels para restaurante", required: true })}
-      ${textareaField({ name: "description", label: "Descrição", value: video.description, rows: 4, required: true })}
+      ${textareaField({ name: "description", label: "Descrição", value: video.description, rows: 4 })}
       ${uploadField({
         target: "url",
         label: "Vídeo",
@@ -1612,7 +1849,7 @@ function openVideoEditor(id = "") {
       })}
       ${uploadField({ target: "thumbnail", label: "Capa do vídeo", type: "image", value: video.thumbnail, title: video.title })}
       <div class="cms-form-grid two">
-        ${selectField({ name: "status", label: "Status", value: video.status || "Rascunho", options: ["Publicado", "Rascunho", "Oculto"] })}
+        ${selectField({ name: "status", label: "Status", value: video.status || "Publicado", options: ["Publicado", "Rascunho", "Oculto"] })}
         ${field({ name: "position", label: "Ordem", value: video.position, type: "number" })}
       </div>
       ${formActions(id ? "Salvar alterações" : "Cadastrar vídeo")}
@@ -1867,7 +2104,7 @@ async function submitProjectForm(form) {
 
 async function submitVideoForm(form) {
   const item = {
-    id: getFormValue(form, "id") || createId("video"),
+    id: normalizeUuid(getFormValue(form, "id"), generateUuid()),
     title: getFormValue(form, "title"),
     description: getFormValue(form, "description"),
     url: getFormValue(form, "url"),
@@ -2355,10 +2592,29 @@ async function handleStandaloneMediaUpload(input) {
   try {
     setUploadStatus(status, type === "video" ? "Enviando vídeo..." : "Enviando imagem...");
     const result = type === "video" ? await uploadVideo(file, status) : await uploadImage(file, status);
+    if (type === "video") {
+      const video = {
+        id: generateUuid(),
+        title: titleFromFileName(file.name),
+        description: "",
+        url: result.url,
+        thumbnail: "",
+        status: "Publicado",
+        position: state.data.videos.length,
+        createdAt: new Date().toISOString(),
+      };
+      state.data = normalizeData(
+        await apiRequest("/api/videos", {
+          method: "POST",
+          body: JSON.stringify(video),
+        }),
+      );
+      setUploadStatus(status, "Vídeo enviado e publicado no site.", "success");
+    }
     await loadMediaLibrary(true);
     await navigator.clipboard?.writeText(result.url);
-    setUploadStatus(status, "Mídia enviada. A URL foi copiada.", "success");
-    showToast("Mídia enviada. URL copiada.");
+    if (type !== "video") setUploadStatus(status, "Mídia enviada. A URL foi copiada.", "success");
+    showToast(type === "video" ? "Vídeo enviado e publicado no site." : "Mídia enviada. URL copiada.");
   } catch (error) {
     setUploadStatus(status, error.message, "error");
     showToast(error.message, "error");

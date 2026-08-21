@@ -16,6 +16,7 @@ const logoList = document.querySelector("[data-logo-list]");
 const testimonialList = document.querySelector("[data-testimonial-list]");
 const metricList = document.querySelector("[data-metric-list]");
 const filterButtons = document.querySelectorAll("[data-filter]");
+const specialtiesTrack = document.querySelector("[data-specialties-track]");
 const contactForm = document.querySelector("[data-contact-form]");
 const formMessage = document.querySelector("[data-form-message]");
 const floatingWhatsapp = document.querySelector("[data-floating-whatsapp]");
@@ -45,10 +46,28 @@ async function fetchSiteData() {
 
 function applyContent(content = {}) {
   Object.entries(content).forEach(([key, value]) => {
-    const element = document.querySelector(`[data-content="${key}"]`);
-    if (element && typeof value === "string" && value.trim()) {
-      element.textContent = value;
-    }
+    document.querySelectorAll(`[data-content="${key}"]`).forEach((element) => {
+      if (element && typeof value === "string" && value.trim()) {
+        element.textContent = value;
+      }
+    });
+  });
+}
+
+function renderSpecialties(value = "") {
+  if (!specialtiesTrack || !value.trim()) return;
+  const items = value
+    .split(/\n|,/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 12);
+  if (!items.length) return;
+  const repeatedItems = Array.from({ length: 4 }, () => items).flat();
+  specialtiesTrack.innerHTML = "";
+  repeatedItems.forEach((item) => {
+    const span = document.createElement("span");
+    span.textContent = item;
+    specialtiesTrack.appendChild(span);
   });
 }
 
@@ -351,7 +370,7 @@ function createVideoFallback(url) {
   const link = document.createElement("a");
 
   fallback.className = "video-fallback";
-  text.textContent = "Este navegador não conseguiu tocar esse formato. Para funcionar melhor, envie o vídeo em MP4.";
+  text.textContent = "Este navegador não conseguiu tocar esse formato. Para funcionar melhor no site, envie o vídeo em MP4.";
   link.href = url;
   link.target = "_blank";
   link.rel = "noopener";
@@ -361,7 +380,7 @@ function createVideoFallback(url) {
   return fallback;
 }
 
-function createModalVideo(url, title) {
+function createModalVideo(url, title, poster = "") {
   const video = document.createElement("video");
   const source = document.createElement("source");
 
@@ -369,6 +388,8 @@ function createModalVideo(url, title) {
   video.playsInline = true;
   video.preload = "metadata";
   video.setAttribute("aria-label", title);
+  video.setAttribute("controlsList", "nodownload");
+  if (poster) video.poster = poster;
   source.src = url;
   source.type = getVideoType(url);
   video.appendChild(source);
@@ -389,8 +410,8 @@ function createModalEmbed(url, title) {
   return iframe;
 }
 
-function createInlineVideo(url, title) {
-  const video = createModalVideo(url, title);
+function createInlineVideo(url, title, poster = "") {
+  const video = createModalVideo(url, title, poster);
   video.className = "inline-video-player";
   return video;
 }
@@ -413,7 +434,7 @@ function openModal(item) {
   const embedUrl = getVideoEmbedUrl(playableUrl);
 
   if (isDirectVideoUrl(playableUrl)) {
-    modalMedia.appendChild(createModalVideo(playableUrl, item.title));
+    modalMedia.appendChild(createModalVideo(playableUrl, item.title, item.thumbnail || ""));
   } else if (embedUrl) {
     modalMedia.appendChild(createModalEmbed(embedUrl, item.title));
   } else if (item.thumbnail) {
@@ -544,7 +565,7 @@ function createVideoCard(video, index) {
   frame.className = "reel-frame";
 
   if (isDirectVideoUrl(video.url)) {
-    frame.appendChild(createInlineVideo(video.url, video.title));
+    frame.appendChild(createInlineVideo(video.url, video.title, video.thumbnail || ""));
   } else if (embedUrl) {
     const posterButton = document.createElement("button");
     const poster = video.thumbnail || getYoutubeThumbnail(video.url);
@@ -577,9 +598,10 @@ function createVideoCard(video, index) {
   }
 
   title.textContent = video.title;
-  description.textContent = video.description;
+  description.textContent = video.description || "";
 
-  card.append(frame, title, description);
+  card.append(frame, title);
+  if (video.description) card.appendChild(description);
 
   if (canPlayInline) {
     expandButton.className = "reel-expand";
@@ -595,7 +617,7 @@ function createVideoCard(video, index) {
 function renderVideos(videos = []) {
   videoList.innerHTML = "";
 
-  const validVideos = videos.filter((video) => isPublished(video) && video.title && video.description && video.url);
+  const validVideos = videos.filter((video) => isPublished(video) && video.title && video.url);
   const source = validVideos.length > 0 ? validVideos : appConfig.sampleVideos || [];
 
   source.forEach((video, index) => {
@@ -719,6 +741,7 @@ renderMetrics();
 
 fetchSiteData().then((siteData) => {
   applyContent(siteData.content);
+  renderSpecialties(siteData.content?.specialtiesItems || "");
   applyLinks(siteData.links);
   if (Array.isArray(siteData.projects) && siteData.projects.length > 0) {
     activeProjects = siteData.projects;

@@ -2,8 +2,21 @@ window.alvesConnectConfig = {
   defaultContent: {
     heroEyebrow: "Social Media • Conteúdo • Estratégia",
     heroTitle: "Alves Connect",
+    heroLineOne: "Conteúdo que conecta.",
+    heroLineTwo: "Estratégia que posiciona.",
+    heroLineThree: "Criatividade que faz sua marca ser lembrada.",
     heroText:
       "Criamos estratégias, conteúdos, vídeos e identidades visuais para transformar a presença digital de marcas em algo profissional, consistente e memorável.",
+    heroPrimaryButton: "Conhecer meu trabalho",
+    heroSecondaryButton: "Solicitar orçamento",
+    heroProofOne: "Social Media",
+    heroProofTwo: "Reels",
+    heroProofThree: "Design",
+    heroProofFour: "Estratégia Digital",
+    heroNoteOne: "Diagnóstico e estratégia",
+    heroNoteTwo: "Conteúdo com intenção",
+    heroNoteThree: "Marca mais memorável",
+    specialtiesItems: "Social Media\nReels\nCriação de Conteúdo\nDesign\nEstratégia\nIdentidade Visual",
     whatsappMessage: "Olá! Gostaria de saber mais sobre a Alves Connect.",
   },
   contact: {

@@ -99,13 +99,51 @@ const defaultServices = [
 ];
 
 const defaultContent = {
+  navHome: "Início",
+  navAbout: "Sobre",
+  navServices: "Serviços",
+  navPortfolio: "Portfólio",
+  navAuthority: "Autoridade",
+  navContact: "Contato",
+  navCta: "Solicitar orçamento",
   heroEyebrow: "Social Media • Conteúdo • Estratégia",
   heroTitle: "Alves Connect",
+  heroLineOne: "Conteúdo que conecta.",
+  heroLineTwo: "Estratégia que posiciona.",
+  heroLineThree: "Criatividade que faz sua marca ser lembrada.",
   heroText:
     "Criamos estratégias, conteúdos, vídeos e identidades visuais para transformar a presença digital de marcas em algo profissional, consistente e memorável.",
+  heroPrimaryButton: "Conhecer meu trabalho",
+  heroSecondaryButton: "Solicitar orçamento",
+  heroProofOne: "Social Media",
+  heroProofTwo: "Reels",
+  heroProofThree: "Design",
+  heroProofFour: "Estratégia Digital",
+  heroNoteOne: "Diagnóstico e estratégia",
+  heroNoteTwo: "Conteúdo com intenção",
+  heroNoteThree: "Marca mais memorável",
+  specialtiesItems: "Social Media\nReels\nCriação de Conteúdo\nDesign\nEstratégia\nIdentidade Visual",
+  aboutLabel: "Sobre",
   aboutTitle: "Conteúdo bonito é importante. Conteúdo com propósito é melhor ainda.",
   aboutText:
     "A Alves Connect nasceu para ajudar marcas a construírem uma presença digital mais profissional, estratégica e autêntica. Cada projeto é pensado de forma personalizada, unindo planejamento, criatividade, produção de conteúdo, vídeo e identidade visual para comunicar aquilo que torna cada negócio único.",
+  aboutPillOne: "Planejamento",
+  aboutPillTwo: "Criatividade",
+  aboutPillThree: "Estratégia",
+  aboutPillFour: "Consistência",
+  servicesLabel: "Serviços",
+  servicesTitle: "O que pode ser desenvolvido para a sua marca",
+  servicesText: "Planos e entregas pensados para dar direção, estética e consistência à presença digital.",
+  worksLabel: "Portfólio",
+  worksFilterAll: "Todos",
+  worksFilterReels: "Reels",
+  worksFilterSocial: "Social Media",
+  worksFilterDesign: "Design",
+  worksFilterCampaigns: "Campanhas",
+  worksFilterEvents: "Eventos",
+  authorityLabel: "Autoridade",
+  resultsLabel: "Resultados",
+  videosLabel: "Vídeos",
   videosTitle: "Reels e vídeos",
   videosText:
     "Uma seleção de vídeos verticais para apresentar ritmo, linguagem visual e produção de conteúdo.",
@@ -116,11 +154,35 @@ const defaultContent = {
   proofText: "Espaço preparado para logos e depoimentos reais cadastrados posteriormente.",
   resultsTitle: "Conteúdo bonito chama atenção. Resultado faz a diferença.",
   resultsText: "Quando houver métricas reais, elas poderão ser apresentadas aqui com clareza e responsabilidade.",
+  processLabel: "Processo",
+  processTitle: "Da ideia até uma presença digital mais consistente",
+  processStepOneTitle: "Briefing",
+  processStepOneText: "Entendemos a marca, o público, os objetivos e o momento atual da comunicação.",
+  processStepTwoTitle: "Estratégia",
+  processStepTwoText: "Definimos posicionamento, formatos, linguagem e calendário com intenção.",
+  processStepThreeTitle: "Produção",
+  processStepThreeText: "Transformamos ideias em conteúdo, design, vídeos, Reels e materiais visuais.",
+  processStepFourTitle: "Publicação",
+  processStepFourText: "Organizamos a entrega para manter consistência, frequência e clareza.",
+  processStepFiveTitle: "Análise e otimização",
+  processStepFiveText: "Avaliamos o que funcionou e ajustamos a rota para evoluir a presença digital.",
   finalCtaTitle: "Pronta para transformar a presença digital da sua marca?",
   finalCtaText: "Conte um pouco sobre seu negócio e receba uma proposta personalizada.",
+  finalCtaPrimaryButton: "Solicitar orçamento",
+  finalCtaWhatsappButton: "Falar no WhatsApp",
+  contactLabel: "Contato",
   contactTitle: "Vamos criar algo juntos?",
   contactText:
     "Se você quer melhorar a presença digital da sua marca, criar conteúdos profissionais ou desenvolver uma comunicação mais consistente, entre em contato.",
+  contactSubmitButton: "Solicitar orçamento",
+  footerText: "Social Media • Conteúdo • Estratégia",
+  footerNavHome: "Início",
+  footerNavAbout: "Sobre",
+  footerNavServices: "Serviços",
+  footerNavPortfolio: "Portfólio",
+  footerNavContact: "Contato",
+  floatingWhatsappSmall: "Fale comigo",
+  floatingWhatsappStrong: "WhatsApp",
   whatsappMessage: "Olá! Gostaria de saber mais sobre a Alves Connect.",
 };
 
@@ -174,12 +236,29 @@ function cleanText(value, maxLength = 1500) {
   return value.trim().slice(0, maxLength);
 }
 
+function isValidUuid(value = "") {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ""));
+}
+
+function normalizeUuid(value, fallback = crypto.randomUUID()) {
+  const raw = String(value ?? "").trim();
+  if (!raw) return fallback;
+  const candidate = raw.replace(/^video-/i, "");
+  return isValidUuid(candidate) ? candidate : fallback;
+}
+
 function normalizeData(data) {
   return {
     content: { ...defaultContent, ...(data.content || {}) },
     links: { ...defaultData.links, ...(data.links || {}) },
     projects: Array.isArray(data.projects) ? data.projects : [],
-    videos: Array.isArray(data.videos) ? data.videos : [],
+    videos: Array.isArray(data.videos)
+      ? data.videos.map((video, index) => ({
+          ...video,
+          id: normalizeUuid(video?.id, crypto.randomUUID()),
+          position: Number.isFinite(Number(video?.position)) ? Number(video.position) : index,
+        }))
+      : [],
     leads: Array.isArray(data.leads) ? data.leads : [],
     services: Array.isArray(data.services) && data.services.length > 0 ? data.services : defaultServices,
     logos: Array.isArray(data.logos) ? data.logos : [],
@@ -313,7 +392,7 @@ async function writeSupabaseData(data) {
   ];
   const linkRows = Object.entries(normalized.links).map(([type, url]) => ({ type, url }));
   const videoRows = normalized.videos.map((video, index) => ({
-    id: video.id || crypto.randomUUID(),
+    id: normalizeUuid(video.id, crypto.randomUUID()),
     title: video.title,
     description: video.description,
     url: video.url,
@@ -777,12 +856,12 @@ function normalizeVideo(body, existing = {}, index = 0) {
   const url = normalizeLink(body.url, "video");
   const thumbnail = normalizeOptionalMediaUrl(body.thumbnail, "capa do vídeo");
 
-  if (!title || !description || !url) {
-    throw new Error("Preencha título, descrição e link do vídeo.");
+  if (!title || !url) {
+    throw new Error("Preencha título e vídeo.");
   }
 
   return {
-    id: cleanText(body.id, 80) || existing.id || crypto.randomUUID(),
+    id: normalizeUuid(cleanText(body.id, 80) || existing.id || crypto.randomUUID(), crypto.randomUUID()),
     title,
     description,
     url,
