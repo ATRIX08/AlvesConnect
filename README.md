@@ -17,6 +17,7 @@ PORT=3000
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=troque-essa-senha
 SESSION_SECRET=troque-por-uma-frase-grande-e-aleatoria
+DATABASE_URL=
 SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
 ```
@@ -26,9 +27,12 @@ Use uma senha real em `ADMIN_PASSWORD` e uma frase grande/aleatória em `SESSION
 O backend usa os dados nesta ordem:
 
 ```txt
-1. Supabase, quando SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY existem
-2. Arquivo local data/site-data.json
+1. Neon/Postgres, quando DATABASE_URL existe
+2. Supabase, quando SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY existem
+3. Arquivo local data/site-data.json
 ```
+
+Durante a migração para Neon, mantenha `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` configurados para o Storage. O Neon substitui o banco Postgres, mas as imagens e vídeos continuam no Supabase Storage até uma migração de arquivos separada.
 
 Projeto Supabase criado:
 
@@ -66,7 +70,7 @@ http://localhost:3000/admin.html
 4. Preencha título, link e descrição.
 5. Clique em `Salvar vídeo`.
 
-Com Supabase configurado, o vídeo será salvo no banco. Sem Supabase, o projeto usa `data/site-data.json` como fallback local.
+Com `DATABASE_URL` configurado, o vídeo será salvo no Neon/Postgres. Sem Neon, mas com Supabase configurado, o projeto usa Supabase. Sem banco remoto, o projeto usa `data/site-data.json` como fallback local.
 
 Na aba `Vídeos`, também é possível escolher um arquivo do computador ou celular. O admin pede uma URL assinada ao backend e envia o vídeo direto para o Supabase Storage. Use MP4, WEBM, OGG ou MOV com até 250MB.
 
@@ -115,7 +119,7 @@ Status
 Data
 ```
 
-No Supabase, aplique `supabase/schema.sql` para criar/atualizar a tabela `leads`. Se a tabela ainda não existir, o backend mantém um fallback usando `site_content`, mas a tabela dedicada é o caminho recomendado.
+No Neon, aplique `neon/schema.sql` ou execute `npm run migrate:neon` depois de configurar `DATABASE_URL`. Se ainda estiver usando Supabase, aplique `supabase/schema.sql`.
 
 Os leads aparecem na aba `Leads` do admin, onde é possível alterar o status entre `Novo`, `Em contato`, `Proposta enviada`, `Fechado` e `Perdido`.
 
@@ -130,6 +134,11 @@ robots.txt
 sitemap.xml
 supabase/
   schema.sql
+neon/
+  schema.sql
+scripts/
+  backup-supabase.js
+  migrate-supabase-to-neon.js
 data/
   site-data.json
 assets/
@@ -145,7 +154,7 @@ assets/
 
 ## Segurança
 
-O usuário, senha, `SESSION_SECRET` e `SUPABASE_SERVICE_ROLE_KEY` ficam somente no backend, via variáveis de ambiente. Não coloque `.env`, `.env.local` ou `.vercel` em repositório público.
+O usuário, senha, `SESSION_SECRET`, `DATABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` ficam somente no backend, via variáveis de ambiente. Não coloque `.env`, `.env.local`, backups ou `.vercel` em repositório público.
 
 O admin usa cookie `httpOnly`, sessão assinada, token CSRF nas ações que alteram dados e limite de tentativas no login. O formulário público também tem limite simples de envio por IP para reduzir spam.
 

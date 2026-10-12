@@ -5,7 +5,9 @@
   "description": "Portfolio Alves Connect com backend simples para admin.",
   "main": "server.js",
   "scripts": {
-    "build": "node --check server.js && node --check assets/js/main.js && node --check assets/js/admin.js",
+    "backup:supabase": "node scripts/backup-supabase.js",
+    "build": "node --check server.js && node --check assets/js/main.js && node --check assets/js/admin.js && node --check scripts/backup-supabase.js && node --check scripts/migrate-supabase-to-neon.js",
+    "migrate:neon": "node scripts/migrate-supabase-to-neon.js",
     "start": "node server.js",
     "dev": "node server.js"
   },
@@ -13,6 +15,7 @@
     "@supabase/supabase-js": "^2.112.2",
     "dotenv": "^16.4.7",
     "express": "^4.19.2",
-    "helmet": "^7.1.0"
+    "helmet": "^7.1.0",
+    "pg": "^8.13.1"
   }
 }

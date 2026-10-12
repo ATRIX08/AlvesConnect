@@ -5,6 +5,7 @@ const path = require("node:path");
 const dotenv = require("dotenv");
 const express = require("express");
 const helmet = require("helmet");
+const { Pool } = require("pg");
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ const dataDir = path.join(rootDir, "data");
 const dataFile = path.join(dataDir, "site-data.json");
 const port = Number(process.env.PORT || 3000);
 let supabaseClient = null;
+let postgresPool = null;
 const projectsContentKey = "portfolioProjects";
 const videosContentKey = "siteVideos";
 const leadsContentKey = "siteLeads";
@@ -280,6 +282,32 @@ function hasSupabaseStorage() {
   return Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
 }
 
+function getDatabaseUrl() {
+  return process.env.DATABASE_URL || process.env.NEON_DATABASE_URL || "";
+}
+
+function hasPostgresDatabase() {
+  return Boolean(getDatabaseUrl());
+}
+
+function getPostgresPool() {
+  if (postgresPool) return postgresPool;
+
+  const databaseUrl = getDatabaseUrl();
+  if (!databaseUrl) {
+    throw new Error("DATABASE_URL nÃ£o configurada.");
+  }
+
+  const isLocalDatabase = /localhost|127\.0\.0\.1/i.test(databaseUrl);
+  postgresPool = new Pool({
+    connectionString: databaseUrl,
+    max: Number(process.env.PG_POOL_MAX || 3),
+    ssl: isLocalDatabase ? false : { rejectUnauthorized: false },
+  });
+
+  return postgresPool;
+}
+
 async function getSupabaseClient() {
   if (supabaseClient) return supabaseClient;
 
@@ -424,6 +452,156 @@ async function writeSupabaseData(data) {
   }
 }
 
+async function readPostgresData() {
+  const pool = getPostgresPool();
+  const [contentResult, linksResult, videosResult] = await Promise.all([
+    pool.query("select key, value from public.site_content"),
+    pool.query("select type, url from public.site_links"),
+    pool.query(
+      `
+        select id, title, description, url, position, created_at
+        from public.videos
+        where active = true
+        order by position asc, created_at asc
+      `,
+    ),
+  ]);
+
+  const content = { ...defaultContent };
+  let projects = [];
+  let leads = [];
+  let services = defaultServices;
+  let logos = [];
+  let testimonials = [];
+  let metrics = [];
+  let enhancedVideos = null;
+
+  contentResult.rows.forEach((item) => {
+    if ([projectsContentKey, videosContentKey, leadsContentKey, servicesContentKey, logosContentKey, testimonialsContentKey, metricsContentKey].includes(item.key)) {
+      const parsed = parseJsonList(item.value, item.key === servicesContentKey ? defaultServices : []);
+      if (item.key === projectsContentKey) projects = parsed;
+      if (item.key === videosContentKey) enhancedVideos = parsed;
+      if (item.key === leadsContentKey) leads = parsed;
+      if (item.key === servicesContentKey) services = parsed;
+      if (item.key === logosContentKey) logos = parsed;
+      if (item.key === testimonialsContentKey) testimonials = parsed;
+      if (item.key === metricsContentKey) metrics = parsed;
+      return;
+    }
+
+    content[item.key] = item.value || "";
+  });
+
+  const links = { ...defaultData.links };
+  linksResult.rows.forEach((item) => {
+    links[item.type] = item.url || "";
+  });
+
+  const tableVideos = videosResult.rows.map((video) => ({
+    id: video.id,
+    title: video.title,
+    description: video.description,
+    url: video.url,
+    position: video.position,
+    thumbnail: "",
+    status: "Publicado",
+    createdAt: video.created_at,
+  }));
+  const videos = Array.isArray(enhancedVideos) && enhancedVideos.length > 0 ? enhancedVideos : tableVideos;
+
+  const databaseLeads = await readPostgresLeads().catch(() => null);
+  if (databaseLeads) {
+    leads = databaseLeads;
+  }
+
+  return normalizeData({ content, links, projects, videos, leads, services, logos, testimonials, metrics });
+}
+
+async function writePostgresData(data) {
+  const pool = getPostgresPool();
+  const normalized = normalizeData(data);
+  const contentRows = [
+    ...Object.entries(normalized.content).map(([key, value]) => ({ key, value })),
+    { key: projectsContentKey, value: JSON.stringify(normalized.projects) },
+    { key: videosContentKey, value: JSON.stringify(normalized.videos) },
+    { key: leadsContentKey, value: JSON.stringify(normalized.leads) },
+    { key: servicesContentKey, value: JSON.stringify(normalized.services) },
+    { key: logosContentKey, value: JSON.stringify(normalized.logos) },
+    { key: testimonialsContentKey, value: JSON.stringify(normalized.testimonials) },
+    { key: metricsContentKey, value: JSON.stringify(normalized.metrics) },
+  ];
+  const linkRows = Object.entries(normalized.links).map(([type, url]) => ({ type, url }));
+  const videoRows = normalized.videos.map((video, index) => ({
+    id: normalizeUuid(video.id, crypto.randomUUID()),
+    title: video.title,
+    description: video.description,
+    url: video.url,
+    position: Number.isFinite(Number(video.position)) ? Number(video.position) : index,
+    active: (video.status || "Publicado") === "Publicado",
+    createdAt: video.createdAt || new Date().toISOString(),
+  }));
+
+  const client = await pool.connect();
+  try {
+    await client.query("begin");
+
+    for (const row of contentRows) {
+      await client.query(
+        `
+          insert into public.site_content (key, value)
+          values ($1, $2)
+          on conflict (key) do update
+          set value = excluded.value
+        `,
+        [row.key, row.value || ""],
+      );
+    }
+
+    for (const row of linkRows) {
+      await client.query(
+        `
+          insert into public.site_links (type, url)
+          values ($1, $2)
+          on conflict (type) do update
+          set url = excluded.url
+        `,
+        [row.type, row.url || ""],
+      );
+    }
+
+    const existingVideosResult = await client.query("select id from public.videos");
+    const nextIds = new Set(videoRows.map((video) => video.id));
+    const idsToDeactivate = existingVideosResult.rows.map((video) => video.id).filter((id) => !nextIds.has(id));
+
+    if (idsToDeactivate.length > 0) {
+      await client.query("update public.videos set active = false where id = any($1::uuid[])", [idsToDeactivate]);
+    }
+
+    for (const video of videoRows) {
+      await client.query(
+        `
+          insert into public.videos (id, title, description, url, position, active, created_at)
+          values ($1, $2, $3, $4, $5, $6, coalesce($7::timestamptz, now()))
+          on conflict (id) do update
+          set title = excluded.title,
+              description = excluded.description,
+              url = excluded.url,
+              position = excluded.position,
+              active = excluded.active
+        `,
+        [video.id, video.title, video.description, video.url, video.position, video.active, video.createdAt],
+      );
+    }
+
+    await client.query("commit");
+  } catch (error) {
+    await client.query("rollback").catch(() => {});
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 function mapLeadRow(row) {
   return {
     id: row.id,
@@ -450,6 +628,60 @@ async function readSupabaseLeads() {
   return data.map(mapLeadRow);
 }
 
+async function readPostgresLeads() {
+  const pool = getPostgresPool();
+  const { rows } = await pool.query(
+    `
+      select id, name, company, phone, service, investment_range, start_timeline, message, status, created_at
+      from public.leads
+      order by created_at desc
+    `,
+  );
+  return rows.map(mapLeadRow);
+}
+
+async function createPostgresLead(lead) {
+  const pool = getPostgresPool();
+  const { rows } = await pool.query(
+    `
+      insert into public.leads (id, name, company, phone, service, investment_range, start_timeline, message, status)
+      values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      returning id, name, company, phone, service, investment_range, start_timeline, message, status, created_at
+    `,
+    [
+      lead.id,
+      lead.name,
+      lead.company,
+      lead.phone,
+      lead.service,
+      lead.investmentRange,
+      lead.startTimeline,
+      lead.message,
+      lead.status,
+    ],
+  );
+  return mapLeadRow(rows[0]);
+}
+
+async function updatePostgresLeadStatus(id, status) {
+  const pool = getPostgresPool();
+  const { rows } = await pool.query(
+    `
+      update public.leads
+      set status = $2
+      where id = $1
+      returning id, name, company, phone, service, investment_range, start_timeline, message, status, created_at
+    `,
+    [id, status],
+  );
+  return rows[0] ? mapLeadRow(rows[0]) : null;
+}
+
+async function deletePostgresLead(id) {
+  const pool = getPostgresPool();
+  await pool.query("delete from public.leads where id = $1", [id]);
+}
+
 async function readFallbackLeads() {
   const data = await readSiteData();
   return data.leads || [];
@@ -463,6 +695,10 @@ async function writeFallbackLeads(leads) {
 }
 
 async function readSiteData() {
+  if (hasPostgresDatabase()) {
+    return readPostgresData();
+  }
+
   if (hasSupabaseStorage()) {
     return readSupabaseData();
   }
@@ -471,6 +707,11 @@ async function readSiteData() {
 }
 
 async function writeSiteData(data) {
+  if (hasPostgresDatabase()) {
+    await writePostgresData(data);
+    return;
+  }
+
   if (hasSupabaseStorage()) {
     await writeSupabaseData(data);
     return;
@@ -916,6 +1157,10 @@ function toLeadRow(lead) {
 async function createLead(body) {
   const lead = normalizeLead(body);
 
+  if (hasPostgresDatabase()) {
+    return createPostgresLead(lead);
+  }
+
   if (hasSupabaseStorage()) {
     const supabase = await getSupabaseClient();
     const { data, error } = await supabase.from("leads").insert(toLeadRow(lead)).select().single();
@@ -935,6 +1180,10 @@ async function updateLeadStatus(id, status) {
 
   if (!allowedStatuses.has(nextStatus)) {
     throw new Error("Status inválido.");
+  }
+
+  if (hasPostgresDatabase()) {
+    return updatePostgresLeadStatus(id, nextStatus);
   }
 
   if (hasSupabaseStorage()) {
@@ -1319,6 +1568,12 @@ app.patch("/api/leads/:id/status", isAuthenticated, requireCsrf, async (request,
 app.delete("/api/leads/:id", isAuthenticated, requireCsrf, async (request, response, next) => {
   try {
     const leadId = cleanText(request.params.id, 80);
+
+    if (hasPostgresDatabase()) {
+      await deletePostgresLead(leadId);
+      response.json(await readSiteData());
+      return;
+    }
 
     if (hasSupabaseStorage()) {
       const supabase = await getSupabaseClient();
