@@ -3,9 +3,10 @@ const path = require("node:path");
 
 const dotenv = require("dotenv");
 
-dotenv.config();
-
 const rootDir = path.join(__dirname, "..");
+dotenv.config({ path: path.join(rootDir, ".env") });
+dotenv.config({ path: path.join(rootDir, ".env.local"), override: true });
+
 const backupRoot = path.join(rootDir, "backups");
 const buckets = ["portfolio-images", "portfolio-videos"];
 const tables = ["site_content", "site_links", "videos", "leads"];

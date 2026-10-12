@@ -7,7 +7,8 @@ const express = require("express");
 const helmet = require("helmet");
 const { Pool } = require("pg");
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, ".env") });
+dotenv.config({ path: path.join(__dirname, ".env.local"), override: true });
 
 const app = express();
 const rootDir = __dirname;

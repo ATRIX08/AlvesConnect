@@ -4,9 +4,10 @@ const path = require("node:path");
 const dotenv = require("dotenv");
 const { Pool } = require("pg");
 
-dotenv.config();
-
 const rootDir = path.join(__dirname, "..");
+dotenv.config({ path: path.join(rootDir, ".env") });
+dotenv.config({ path: path.join(rootDir, ".env.local"), override: true });
+
 const schemaFile = path.join(rootDir, "neon", "schema.sql");
 const databaseUrl = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL || "";
 

@@ -21,3 +21,7 @@ build/
 
 # Backups locais de migração
 backups/
+
+# Arquivos auxiliares gerados por integrações/agentes locais
+.agents/
+skills-lock.json
